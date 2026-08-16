@@ -4,8 +4,12 @@ import { ArrowRight, Check } from 'lucide-react'
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import Navbar from './Navbar.jsx'
 import SampleKitPage from './SampleKitPage.jsx'
+import PricingPage from './PricingPage.jsx'
+import { DELIVERABLE_LABELS } from './pricing.js'
 
-const DELIVERABLES = ['Campaign Stills', 'Body-Type Renders', 'Short Videos', 'Thai Captions']
+// Shared with the pricing page so the hero pills and the price list can never
+// drift apart.
+const DELIVERABLES = DELIVERABLE_LABELS
 
 const MODELS = [
   { src: '/images/models/petite.webp', label: 'Petite' },
@@ -301,7 +305,105 @@ function ShowcaseSection() {
   )
 }
 
+// Placeholder copy — the nav has always pointed at #process and #contact, so
+// the sections need to exist. Worth a proper copy pass.
+const PROCESS_STEPS = [
+  {
+    step: '01',
+    title: 'Send what you already have',
+    body: 'Product photos from your phone are fine — flat-lay or on-hanger, a few angles. No studio, no lightbox, no booking.',
+  },
+  {
+    step: '02',
+    title: 'We build the campaign',
+    body: 'Campaign stills on all four body types, short-form video cut for IG and TikTok, and Thai captions written to run as-is.',
+  },
+  {
+    step: '03',
+    title: 'It lands in 72 hours',
+    body: 'One delivery, ready to post or boost. The clock starts once we have usable photos and you have approved the brief.',
+  },
+]
+
+function ProcessSection() {
+  const navigate = useNavigate()
+
+  return (
+    <section id="process" className="w-full bg-[#1C1015] border-t border-white/10 px-6 py-20">
+      <div className="mx-auto max-w-6xl">
+        <p className="mb-3 font-sans text-xs uppercase tracking-[0.15em] text-[#D9A9B5]">
+          Process
+        </p>
+        <h2 className="mb-12 max-w-2xl font-serif text-3xl font-bold leading-tight tracking-tight text-white md:text-4xl">
+          three steps, no photoshoot.
+        </h2>
+
+        <ol className="grid gap-8 md:grid-cols-3">
+          {PROCESS_STEPS.map((item) => (
+            <li key={item.step} className="border-t border-white/15 pt-5">
+              <span className="font-sans text-xs font-semibold tabular-nums tracking-[0.12em] text-[#D9A9B5]">
+                {item.step}
+              </span>
+              <h3 className="mt-3 mb-2 font-serif text-xl font-bold text-white">{item.title}</h3>
+              <p className="font-sans text-[15px] leading-relaxed text-[#D9C4CA]">{item.body}</p>
+            </li>
+          ))}
+        </ol>
+
+        <button
+          type="button"
+          onClick={() => navigate('/pricing')}
+          className="mt-12 flex cursor-pointer items-center gap-1.5 font-sans text-xs font-semibold uppercase tracking-wide text-[#D9A9B5] transition-opacity hover:opacity-60"
+        >
+          See what it costs
+          <ArrowRight size={14} strokeWidth={2.5} />
+        </button>
+      </div>
+    </section>
+  )
+}
+
+function ContactSection() {
+  const navigate = useNavigate()
+
+  return (
+    <section
+      id="contact"
+      className="w-full bg-[#1C1015] border-t border-white/10 px-6 py-20 text-center"
+    >
+      <div className="mx-auto flex max-w-2xl flex-col items-center gap-5">
+        <h2 className="font-serif text-3xl font-bold leading-tight tracking-tight text-white md:text-4xl">
+          start with one product.
+        </h2>
+        <p className="font-sans leading-relaxed text-[#D9C4CA]">
+          Send a few photos and we&rsquo;ll show you what a full campaign looks like on your own
+          product — no cost, no commitment.
+        </p>
+        <button
+          type="button"
+          onClick={() => navigate('/sample-kit')}
+          className="w-full cursor-pointer rounded-lg bg-[#6E2A3E] px-8 py-3.5 font-sans font-semibold text-white transition-opacity hover:opacity-90 sm:w-auto"
+        >
+          Get a free sample kit
+        </button>
+        <p className="font-sans text-xs text-[#8A6F76]">
+          72 hours · four body types · prices exclude 7% VAT
+        </p>
+      </div>
+    </section>
+  )
+}
+
 function HomePage() {
+  const { hash } = useLocation()
+
+  // Arriving from another route with a hash (e.g. /#the-kit) needs an explicit
+  // scroll — the router doesn't do it.
+  useEffect(() => {
+    if (!hash) return
+    document.querySelector(hash)?.scrollIntoView({ behavior: 'smooth' })
+  }, [hash])
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
@@ -315,6 +417,8 @@ function HomePage() {
         <HeroContent />
       </section>
       <ShowcaseSection />
+      <ProcessSection />
+      <ContactSection />
     </motion.div>
   )
 }
@@ -327,6 +431,7 @@ export default function App() {
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<HomePage />} />
+          <Route path="/pricing" element={<PricingPage />} />
           <Route path="/sample-kit" element={<SampleKitPage />} />
         </Routes>
       </AnimatePresence>
